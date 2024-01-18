@@ -190,7 +190,7 @@ class SentimentAnalyzer():
             figure.show()
        
     
-    def calculate_rsenti(self, window=14):
+     def calculate_rsenti(self, window=14):
         
         '''
         Description
@@ -215,12 +215,18 @@ class SentimentAnalyzer():
         df['sentiment_score']=df['positive']+(df['positive']*df['neutral'])-(df['negative'])-(df['negative']*df['neutral'])
         df['sent_pos']=np.where(df['sentiment_score']>=0,df['sentiment_score'],0)
         df['sent_neg']=np.where(df['sentiment_score']<0,abs(df['sentiment_score']),0)
+        df=df.reset_index()
+        df['calc_rsi_step_two']=np.where(df.index>13, True, False)
         df['sent_pos_mean']=df['sent_pos'].rolling(window).mean()
         df['sent_neg_mean']=df['sent_neg'].rolling(window).mean()
-        
-        df['RSentI']=100-(100/(1+(df['sent_pos_mean']/df['sent_neg_mean'])))
+        df['sent_pos_mean_shift']=df['sent_pos_mean'].shift(1)
+        df['sent_neg_mean_shift']=df['sent_neg_mean'].shift(1)
+        math_formula_step_one=100-(100/(1+(df['sent_pos_mean']/df['sent_neg_mean'])))
+        math_formula_step_two=100-(100/(1+(((df['sent_pos_mean_shift']*(window-1))+df['sent_pos'])/window)/(((df['sent_neg_mean_shift']*(window-1))+df['sent_neg'])/window)))
+        df['RSentI']=np.where(df['calc_rsi_step_two']==False, math_formula_step_one, math_formula_step_two)
         cols_to_save=[col for col in df.columns if col not in ['sent_pos', 'sent_neg', 'sent_pos_mean','sent_neg_mean']]
         df=df.loc[:,cols_to_save]
+        df=df.set_index('date')
         self.stock_news_sent_df=df
         
     
