@@ -224,7 +224,7 @@ class SentimentAnalyzer():
         math_formula_step_one=100-(100/(1+(df['sent_pos_mean']/df['sent_neg_mean'])))
         math_formula_step_two=100-(100/(1+(((df['sent_pos_mean_shift']*(window-1))+df['sent_pos'])/window)/(((df['sent_neg_mean_shift']*(window-1))+df['sent_neg'])/window)))
         df['RSentI']=np.where(df['calc_rsi_step_two']==False, math_formula_step_one, math_formula_step_two)
-        cols_to_save=[col for col in df.columns if col not in ['sent_pos', 'sent_neg', 'sent_pos_mean','sent_neg_mean']]
+        cols_to_save=[col for col in df.columns if col not in ['sent_pos', 'sent_neg', 'sent_pos_mean','sent_neg_mean','sent_pos_mean_shift','sent_neg_mean_shift','calc_rsi_step_two']]
         df=df.loc[:,cols_to_save]
         df=df.set_index('date')
         self.stock_news_sent_df=df
@@ -293,8 +293,8 @@ class SentimentAnalyzer():
         Parameters
         ============================================
     
-        stat_types -> str possible values {posts, comments, likes, impressions}
-        period -> str, how resample data to plot, possible values are the same as for pandas.DataFrame().resample() method
+        stat_types -> array with possible values {posts, comments, likes, impressions}
+                period -> str, how resample data to plot, possible values are the same as for pandas.DataFrame().resample() method e.g. D,W,M or 1h, 2h ...
         
         '''
 
