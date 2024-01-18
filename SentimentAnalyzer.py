@@ -190,7 +190,7 @@ class SentimentAnalyzer():
             figure.show()
        
     
-     def calculate_rsenti(self, window=14):
+    def calculate_rsenti(self, window=14):
         
         '''
         Description
